@@ -1,0 +1,61 @@
+default:
+    
+    username: marcot
+    password: test
+    
+    before:
+        - iptables -P INPUT ACCEPT
+        - iptables -P OUTPUT ACCEPT
+        - iptables -P FORWARD ACCEPT
+        - iptables -F
+        - iptables -A INPUT -p tcp --dport ssh -j ACCEPT
+        - iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+        - iptables -P INPUT DROP
+        - iptables -P OUTPUT ACCEPT
+        - iptables -P FORWARD DROP
+        
+    after:
+        - iptables-save > /etc/firewall.conf
+        
+    error:
+        - iptables-restore /etc/firewall.conf
+        
+groups:
+    
+    webWorkers:
+    
+        commands:
+            - command: iptables -A INPUT -s @ --dport 8080 -j ACCEPT
+              at: { host : 'proxy' }
+          
+hosts:
+    
+    proxy:
+        
+        hostname: 127.0.0.1
+        
+        before:
+            - iptables -A OUTPUT -m conntrack --ctstate INVALID -j DROP
+            - iptables -A OUTPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+            - iptables -P OUTPUT DROP
+        
+        commands:
+            - iptables -A INPUT -p tcp --dport http -j ACCEPT
+            - command: iptables - A OUTPUT -p tcp --dport 8080 -d @ -j ACCEPT
+              at: { group : 'webWorkers' }
+    
+    web1:
+    
+        hostname: 127.0.0.2
+        groups: [ 'webWorkers' ]
+    
+    web2:
+    
+        hostname: 127.0.0.3
+        groups: [ 'webWorkers' ]
+    
+    web3:
+    
+        hostname: 127.0.0.4
+        groups: [ 'webWorkers' ]
+    

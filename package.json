@@ -1,0 +1,31 @@
+{
+  "name": "huxtable",
+  "version": "0.6.0",
+  "author": "Marco Tabini <marcot@tabini.ca>",
+  "description": "iptables cluster management tool",
+  "contributors": [],
+  "main" : "./lib/index.js",
+  "dependencies" : {
+    "direktor"  :  ">=0.5.0",
+    "bunyan" : ">=0.21.1",
+    "js-yaml" : ">=2.0.5",
+    "chai" : ">=1.5.0",
+    "commander" : ">=1.1.1",
+    "progress" : ">=0.1.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "./node_modules/mocha/bin/mocha -R dot -u tdd tests/"
+  },
+  "devDependencies": {
+    "async"  :  ">=0.2.8",
+    "mocha"  :  ">=1.9.0"
+  },
+  "keywords" : ["iptables", "cluster", "firewall"],
+  "engines": {
+    "node": ">=0.8.7"
+  },
+  "repository" : { "type" : "git" , "url" : "http://github.com/mtabini/huxtable.git" },
+  "licenses": [ { "type": "MIT", "url": "http://github.com/mtabini/huxtable/raw/master/LICENSE" } ]
+}
+

@@ -1,0 +1,84 @@
+#!/usr/local/bin/node
+
+var program = require('commander');
+var bunyan = require('bunyan');
+var parser = require('../lib/parser');
+var path = require('path');
+var ProgressBar = require('progress');
+
+program
+    .version('1.0')
+    .usage('[options] <yamlfile>')
+    .option('-L --log <logfile>', 'Save log to file')
+    .option('-S --stdout', 'Print log to stdout')
+    .option('--dry', 'Output command plan only. Do not execute.')
+    .parse(process.argv);
+    
+    
+var log = {
+    name : 'huxtable',
+    streams : []
+};
+
+if (program.log) {
+    log.streams.push({level : 'info' , path : program.log });
+}
+
+if (program.stdout) {
+    log.streams.push({level : 'info' , stream : process.stdout });
+}
+
+if (program.args.length !== 1) {
+    console.log('Exactly one YAML file is required.');
+    return;
+}
+
+parser.parse(path.resolve(program.args[0]), function(err, spec) {
+    if (err) {
+        return console.log(err.message);
+    }
+    
+    var session = spec.compile();
+    
+    session.logger = new bunyan(log);
+    
+    if (program.dry) {
+        return console.log(session.toString());
+    }
+    
+    var progress = new ProgressBar(
+        '   Executing... [:bar] :percent :etas',
+        {
+            complete : '=',
+            incomplete : ' ',
+            width : 20,
+            total : session.tasks.length
+        }
+    );
+    
+    var errors = [];
+    
+    progress.tick(0);
+    
+    session.execute(
+        function(err) {
+            progress.tick(session.tasks.length);
+            
+            if (errors.length) {
+                console.log();
+                console.log();
+                errors.forEach(function(error) {
+                    console.log(error);
+                });
+            }
+            
+            process.exit(errors.length);
+        },
+        function(task, err) {
+            if (err) {
+                errors.push('Error : ' + err.message + ' in task ' + task);
+            }
+            
+            progress.tick(1);
+        });
+});

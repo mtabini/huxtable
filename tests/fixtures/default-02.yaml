@@ -1,0 +1,47 @@
+# The `before` in `default` has a command that doesn't follow the right syntax.
+
+default:
+    
+    before:
+        - wrong : command-before
+        
+    commands:
+        - command-during
+        
+    after:
+        - command-after
+        
+    error:
+        - command-error
+        
+groups:
+    
+    group1:
+    
+        commands:
+            - command: group1-command @
+              at: { host: host1 }
+          
+hosts:
+    
+    host1:
+    
+        hostname: 127.0.0.2
+    
+    host2:
+    
+        groups: [ 'group1' ]
+        hostname: 127.0.0.3
+    
+    host3:
+    
+        groups: [ 'group1' ]
+        hostname: 127.0.0.4
+    
+    host4:
+    
+        hostname: 127.0.0.5
+    
+        commands:
+            - command: host4-command @
+              at: { group : group1 }

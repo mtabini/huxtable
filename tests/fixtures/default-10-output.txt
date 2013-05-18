@@ -1,0 +1,88 @@
+Host: 127.0.0.1
+Password: test
+BEFORE
+    iptables -P INPUT ACCEPT
+    iptables -P OUTPUT ACCEPT
+    iptables -P FORWARD ACCEPT
+    iptables -F
+    iptables -A INPUT -p tcp --dport ssh -j ACCEPT
+    iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+    iptables -P INPUT DROP
+    iptables -P OUTPUT ACCEPT
+    iptables -P FORWARD DROP
+    iptables -A OUTPUT -m conntrack --ctstate INVALID -j DROP
+    iptables -A OUTPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+    iptables -P OUTPUT DROP
+COMMANDS
+    iptables -A INPUT -p tcp --dport http -j ACCEPT
+    iptables - A OUTPUT -p tcp --dport 8080 -d 127.0.0.2 -j ACCEPT
+    iptables - A OUTPUT -p tcp --dport 8080 -d 127.0.0.3 -j ACCEPT
+    iptables - A OUTPUT -p tcp --dport 8080 -d 127.0.0.4 -j ACCEPT
+AFTER
+    iptables-save > /etc/firewall.conf
+ERROR
+    iptables-restore /etc/firewall.conf
+
+===
+
+Host: 127.0.0.2
+Password: test
+BEFORE
+    iptables -P INPUT ACCEPT
+    iptables -P OUTPUT ACCEPT
+    iptables -P FORWARD ACCEPT
+    iptables -F
+    iptables -A INPUT -p tcp --dport ssh -j ACCEPT
+    iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+    iptables -P INPUT DROP
+    iptables -P OUTPUT ACCEPT
+    iptables -P FORWARD DROP
+COMMANDS
+    iptables -A INPUT -s 127.0.0.1 --dport 8080 -j ACCEPT
+AFTER
+    iptables-save > /etc/firewall.conf
+ERROR
+    iptables-restore /etc/firewall.conf
+
+===
+
+Host: 127.0.0.3
+Password: test
+BEFORE
+    iptables -P INPUT ACCEPT
+    iptables -P OUTPUT ACCEPT
+    iptables -P FORWARD ACCEPT
+    iptables -F
+    iptables -A INPUT -p tcp --dport ssh -j ACCEPT
+    iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+    iptables -P INPUT DROP
+    iptables -P OUTPUT ACCEPT
+    iptables -P FORWARD DROP
+COMMANDS
+    iptables -A INPUT -s 127.0.0.1 --dport 8080 -j ACCEPT
+AFTER
+    iptables-save > /etc/firewall.conf
+ERROR
+    iptables-restore /etc/firewall.conf
+
+===
+
+Host: 127.0.0.4
+Password: test
+BEFORE
+    iptables -P INPUT ACCEPT
+    iptables -P OUTPUT ACCEPT
+    iptables -P FORWARD ACCEPT
+    iptables -F
+    iptables -A INPUT -p tcp --dport ssh -j ACCEPT
+    iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+    iptables -P INPUT DROP
+    iptables -P OUTPUT ACCEPT
+    iptables -P FORWARD DROP
+COMMANDS
+    iptables -A INPUT -s 127.0.0.1 --dport 8080 -j ACCEPT
+AFTER
+    iptables-save > /etc/firewall.conf
+ERROR
+    iptables-restore /etc/firewall.conf
+
