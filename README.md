@@ -46,6 +46,7 @@ Huxtable supports three properties to provide connection details; they can be sp
 - `username` The username to be used when connecting.
 - `password` The password to be used when connecting.
 - `privateKey` The private key to be used for key-based authentication.
+- `passphrase` The passphrase require to decrypt the private key, if any.
 
 In addition, every host must have a `hostname` property that provides either its FQN or IP address.
 
